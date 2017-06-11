@@ -8,10 +8,28 @@
     tools:context="advancedtech.nglabornetzgeraet.Devicesist"
     tools:showIn="@layout/activity_devicesist">
 
-    <ListView
-        android:layout_width="352dp"
-        android:layout_height="464dp"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="23dp" />
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="-138dp"
+        android:layout_marginStart="104dp"
+        android:layout_marginTop="577dp"
+        android:onClick="settingsButtonOnClick"
+        android:text="@string/settings"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintTop_creator="1" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onConnectingScreenButtonClick"
+        android:text="Connecting Screen"
+        tools:layout_editor_absoluteX="125dp"
+        tools:layout_editor_absoluteY="155dp" />
+
 
 </android.support.constraint.ConstraintLayout>

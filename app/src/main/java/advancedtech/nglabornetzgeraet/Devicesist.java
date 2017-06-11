@@ -1,5 +1,6 @@
 package advancedtech.nglabornetzgeraet;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -49,4 +50,21 @@ public class Devicesist extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void settingsButtonOnClick(View view) {
+        Intent intent = new Intent(this, Settings.class);
+        startActivity(intent);
+    }
+
+    public void onConnectingScreenButtonClick(View view) {
+        Intent intent = new Intent(this, PowerSupplyConnecting.class);
+        startActivity(intent);
+    }
+
+    // Reading Settings
+    /*
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    String setting = prefs.getString("key_aus_xml", "Default Value , maybe if nothing is there");
+    Toast.makeText(this, setting, Toast.LENGTH_LONG).show();
+    */
 }
