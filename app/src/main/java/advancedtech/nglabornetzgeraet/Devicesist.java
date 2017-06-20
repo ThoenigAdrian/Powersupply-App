@@ -1,5 +1,6 @@
 package advancedtech.nglabornetzgeraet;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -9,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class Devicesist extends AppCompatActivity {
 
@@ -56,7 +58,38 @@ public class Devicesist extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public boolean bluetoothAdapterAvailable(){
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    public boolean bluetoothConnectivityAvailable(){
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+
+        } else {
+            if (bluetoothAdapter.isEnabled()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void onConnectingScreenButtonClick(View view) {
+        if(bluetoothAdapterAvailable())
+            Toast.makeText(this, "Bluetooth Adapter Available", Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(this, "Bluetooth Adapter Not Available", Toast.LENGTH_LONG).show();
+        if(bluetoothConnectivityAvailable())
+            Toast.makeText(this, "Bluetooth Connectivity Available", Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(this, "Bluetooth Connectivity Not Available", Toast.LENGTH_LONG).show();
         Intent intent = new Intent(this, PowerSupplyConnecting.class);
         startActivity(intent);
     }
