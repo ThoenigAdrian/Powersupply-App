@@ -9,7 +9,7 @@
     <Button
         android:layout_width="139dp"
         android:layout_height="36dp"
-        android:background="@drawable/colored_button"
+        android:background="@drawable/colored_unclickable_button"
         android:text="@string/connecting_str"
         android:textColor="@android:color/white"
         android:textSize="12sp"
