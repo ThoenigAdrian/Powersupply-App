@@ -1,10 +1,10 @@
 package advancedtech.nglabornetzgeraet;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -51,6 +51,22 @@ public class Devicesist extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public boolean wifiEnabled(){
+        WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if(wifi != null)
+            return wifi.isWifiEnabled();
+        else
+            return false;
+    }
+
+    public boolean wifiAdapterAvailable(){
+        WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if(wifi == null)
+            return false;
+        else
+            return true;
+    }
+
     public boolean bluetoothAdapterAvailable(){
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
@@ -83,6 +99,15 @@ public class Devicesist extends AppCompatActivity {
             Toast.makeText(this, "Bluetooth Connectivity Available", Toast.LENGTH_LONG).show();
         else
             Toast.makeText(this, "Bluetooth Connectivity Not Available", Toast.LENGTH_LONG).show();
+        if (wifiAdapterAvailable())
+            Toast.makeText(this, "Wifi Adapter Available", Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(this, "Wifi Adapter not available", Toast.LENGTH_LONG).show();
+        if (wifiEnabled())
+            Toast.makeText(this, "Wifi Enabled", Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(this, "Wifi Disabled", Toast.LENGTH_LONG).show();
+
         Intent intent = new Intent(this, PowerSupplyConnecting.class);
         startActivity(intent);
     }
