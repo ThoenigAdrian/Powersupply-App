@@ -38,14 +38,12 @@ import java.util.Random;
 
 public class Devicesist extends AppCompatActivity{
 
-    private ArrayList<String> data = new ArrayList<String>();
-    private WifiManager wlan_manager;
+    private ArrayList<String> data = new ArrayList<>();
     private DatagramSocket udpListenSocket;
     private Map<Integer, JSONObject> availablePowerSupplies = new HashMap<>();
-    private int refreshDeviceListPeriod = 2000; // 5 seconds by default, can be changed later
     private Handler beaconHandler;
-    WifiManager.WifiLock lock;
-    WifiManager.MulticastLock lock2;
+    WifiManager.WifiLock wifiLock;
+    WifiManager.MulticastLock wifiMulticastLock;
 
     Runnable beaconCollector = new Runnable() {
         @Override
@@ -56,6 +54,7 @@ public class Devicesist extends AppCompatActivity{
             } finally {
                 // 100% guarantee that this always happens, even if
                 // your update method throws an exception
+                int refreshDeviceListPeriod = 2000;
                 beaconHandler.postDelayed(beaconCollector, refreshDeviceListPeriod);
             }
         }
@@ -70,7 +69,6 @@ public class Devicesist extends AppCompatActivity{
         setSupportActionBar(toolbar);
 
         ListView lv = (ListView) findViewById(R.id.listview);
-        generateListContent();
         lv.setAdapter(new MyListAdapter(this, R.layout.power_supply_list_item, data));
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
@@ -139,13 +137,13 @@ public class Devicesist extends AppCompatActivity{
 
     private void initializeWlan()
     {
-        wlan_manager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (wlan_manager!=null){
-            lock = wlan_manager.createWifiLock("nglabornetzgeraetlock");
-            lock.acquire();
-            lock2 = wlan_manager.createMulticastLock("nglabornetzgeraetlock2");
-            lock2.setReferenceCounted(false);
-            lock2.acquire();
+        WifiManager wlan_manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (wlan_manager !=null){
+            wifiLock = wlan_manager.createWifiLock("nglabornetzgeraetlock");
+            wifiLock.acquire();
+            wifiMulticastLock = wlan_manager.createMulticastLock("nglabornetzgeraetlock2");
+            wifiMulticastLock.setReferenceCounted(false);
+            wifiMulticastLock.acquire();
         }
         try
         {
@@ -191,30 +189,19 @@ public class Devicesist extends AppCompatActivity{
         startActivity(intent);
     }
 
-    public boolean wifiEnabled(){
-        WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if(wifi != null)
-            return wifi.isWifiEnabled();
-        else
-            return false;
+    public boolean wifiEnabled() {
+        WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        return wifi != null && wifi.isWifiEnabled();
     }
 
     public boolean wifiAdapterAvailable(){
         WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if(wifi == null)
-            return false;
-        else
-            return true;
+        return wifi != null;
     }
 
     public boolean bluetoothAdapterAvailable(){
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
-            return false;
-        }
-        else{
-            return true;
-        }
+        return bluetoothAdapter != null;
     }
 
     public boolean bluetoothConnectivityAvailable(){
@@ -253,7 +240,7 @@ public class Devicesist extends AppCompatActivity{
     }
 
     public void updateDeviceList(){
-        data = new ArrayList<String>();
+        data = new ArrayList<>();
         for(Map.Entry<Integer, JSONObject> entry : availablePowerSupplies.entrySet())
         {
             JSONObject value = entry.getValue();
@@ -265,14 +252,13 @@ public class Devicesist extends AppCompatActivity{
 
         }
         ListView lv = (ListView) findViewById(R.id.listview);
-        generateListContent();
         lv.setAdapter(new MyListAdapter(this, R.layout.power_supply_list_item, data));
 
     }
 
     private class MyListAdapter extends ArrayAdapter<String> {
         private int layout;
-        public MyListAdapter(@NonNull Context context, @LayoutRes int resource, @NonNull List<String> objects) {
+        private MyListAdapter(@NonNull Context context, @LayoutRes int resource, @NonNull List<String> objects) {
             super(context, resource, objects);
             layout = resource;
         }
@@ -280,7 +266,7 @@ public class Devicesist extends AppCompatActivity{
         @NonNull
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            ViewHolder mainViewHolder = null;
+            ViewHolder mainViewHolder;
 
             if(convertView == null){
                 LayoutInflater inflater = LayoutInflater.from(getContext());
@@ -302,7 +288,7 @@ public class Devicesist extends AppCompatActivity{
         }
     }
 
-    public class ViewHolder{
+    private class ViewHolder{
         ImageView powerSupplyIcon;
         TextView powerSupplyInfo;
         ImageView connectionTypeSymbol;
