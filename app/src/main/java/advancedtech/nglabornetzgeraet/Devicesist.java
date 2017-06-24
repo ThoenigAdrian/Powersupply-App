@@ -1,5 +1,5 @@
 package advancedtech.nglabornetzgeraet;
-
+import android.os.Handler;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ButtonBarLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,20 +17,50 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class Devicesist extends AppCompatActivity{
 
     private ArrayList<String> data = new ArrayList<String>();
+    private WifiManager wlan_manager;
+    private DatagramSocket udpListenSocket;
+    private Map<Integer, JSONObject> availablePowerSupplies = new HashMap<>();
+    private int refreshDeviceListPeriod = 2000; // 5 seconds by default, can be changed later
+    private Handler beaconHandler;
+    WifiManager.WifiLock lock;
+    WifiManager.MulticastLock lock2;
+
+    Runnable beaconCollector = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                collectBeacons(); //this function can change value of refreshDeviceListPeriod.
+                updateDeviceList();
+            } finally {
+                // 100% guarantee that this always happens, even if
+                // your update method throws an exception
+                beaconHandler.postDelayed(beaconCollector, refreshDeviceListPeriod);
+            }
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,22 +75,91 @@ public class Devicesist extends AppCompatActivity{
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(Devicesist.this, PowerSupplyConnecting.class);
                 startActivity(intent);
             }
         });
 
+        initializeWlan();
+        beaconHandler = new Handler();
+        startRepeatingTask();
+
+
     }
 
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-        Intent intent = new Intent(Devicesist.this, Settings.class);
-        startActivity(intent);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopRepeatingTask();
+    }
+
+    void startRepeatingTask() {
+        beaconCollector.run();
+    }
+
+    void stopRepeatingTask() {
+        beaconHandler.removeCallbacks(beaconCollector);
+    }
+
+    private void collectBeacons()
+    {
+        byte[] receivedata = new byte[1024];
+        DatagramPacket recv_packet = new DatagramPacket(receivedata, receivedata.length);
+        try{
+            udpListenSocket.setSoTimeout(100);
+        }
+        catch (SocketException e)
+        {
+            Toast.makeText(this, "Can't set udp timeout for whatever reason : " + e.toString(), Toast.LENGTH_LONG).show();
+        }
+        while(true) {
+            try {
+                udpListenSocket.receive(recv_packet);
+                String recv_string = new String(recv_packet.getData());
+                JSONObject reader;
+                try {
+                    reader = new JSONObject(recv_string);
+                    String id = reader.getString("ID");
+                    Integer id_ = Integer.parseInt(id);
+                    availablePowerSupplies.put(id_, reader);
+                } catch (JSONException e) {
+                    Toast.makeText(this, "Can't set udp timeout for whatever reason : " + e.toString(), Toast.LENGTH_LONG).show();
+                }
+
+
+            } catch (SocketTimeoutException e) {
+                break;
+            } catch (IOException e) {
+                Toast.makeText(this, "Can't receive from UDP Socket becuase" + e.toString(), Toast.LENGTH_LONG).show();
+                break;
+            }
+        }
+    }
+
+    private void initializeWlan()
+    {
+        wlan_manager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (wlan_manager!=null){
+            lock = wlan_manager.createWifiLock("nglabornetzgeraetlock");
+            lock.acquire();
+            lock2 = wlan_manager.createMulticastLock("nglabornetzgeraetlock2");
+            lock2.setReferenceCounted(false);
+            lock2.acquire();
+        }
+        try
+        {
+            udpListenSocket = new DatagramSocket(5455);
+        }
+        catch (SocketException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void generateListContent(){
-        for(int i = 0; i < 10; i++){
-            data.add("Netzgerät ID:  " + new Random().nextInt(999999));
+        for(int i = 0; i < 3; i++){
+            data.add("Fake Netzgerät (ID:  " + new Random().nextInt(999999) + ")");
         }
     }
 
@@ -155,6 +253,20 @@ public class Devicesist extends AppCompatActivity{
     }
 
     public void updateDeviceList(){
+        data = new ArrayList<String>();
+        for(Map.Entry<Integer, JSONObject> entry : availablePowerSupplies.entrySet())
+        {
+            JSONObject value = entry.getValue();
+            try {
+                data.add(value.getString("ID"));
+            } catch (JSONException e) {
+                Toast.makeText(this, "JSON Exception in updateDeviceList", Toast.LENGTH_LONG).show();
+            }
+
+        }
+        ListView lv = (ListView) findViewById(R.id.listview);
+        generateListContent();
+        lv.setAdapter(new MyListAdapter(this, R.layout.power_supply_list_item, data));
 
     }
 
