@@ -78,4 +78,5 @@
     <string name="connecting">Verbinden...</string>
     <string name="connecting_str">Verbinden...</string>
     <string name="no_wireless_warning">Aktiviere WLAN/Bluetooth um dich mit einem Netzgerät zu verbinden</string>
+    <string name="heading">Wähle ein Netzgerät</string>
 </resources>

@@ -22,5 +22,6 @@
 
 
     <include layout="@layout/content_devicesist" />
+    <include layout="@layout/power_supply_list_item" />
 
 </android.support.design.widget.CoordinatorLayout>
