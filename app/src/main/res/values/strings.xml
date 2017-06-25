@@ -85,4 +85,5 @@
     <string name="example_current_channel_1">3.3 A</string>
     <string name="example_voltage_channel_1">12.3 V</string>
     <string name="example_voltage_channel_2">2.0 V</string>
+    <string name="connected_string">Verbunden</string>
 </resources>
