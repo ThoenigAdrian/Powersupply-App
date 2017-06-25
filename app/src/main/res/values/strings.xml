@@ -79,4 +79,10 @@
     <string name="connecting_str">Verbinden...</string>
     <string name="no_wireless_warning">Aktiviere WLAN/Bluetooth um dich mit einem Netzgerät zu verbinden</string>
     <string name="heading">Wähle ein Netzgerät</string>
+    <string name="channel_2">Kanal 2</string>
+    <string name="channel_1">Kanal 1</string>
+    <string name="example_current_channel_2">1.0 A</string>
+    <string name="example_current_channel_1">3.3 A</string>
+    <string name="example_voltage_channel_1">12.3 V</string>
+    <string name="example_voltage_channel_2">2.0 V</string>
 </resources>

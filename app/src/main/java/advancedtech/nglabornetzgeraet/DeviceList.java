@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class Devicesist extends AppCompatActivity{
+public class DeviceList extends AppCompatActivity{
 
     private ArrayList<String> data = new ArrayList<>();
     private DatagramSocket udpListenSocket;
@@ -74,7 +74,7 @@ public class Devicesist extends AppCompatActivity{
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(Devicesist.this, PowerSupplyConnecting.class);
+                Intent intent = new Intent(DeviceList.this, PowerSupplyConnecting.class);
                 startActivity(intent);
             }
         });
@@ -155,11 +155,6 @@ public class Devicesist extends AppCompatActivity{
         }
     }
 
-    private void generateListContent(){
-        for(int i = 0; i < 3; i++){
-            data.add("Fake Netzgerät (ID:  " + new Random().nextInt(999999) + ")");
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

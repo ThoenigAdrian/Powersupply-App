@@ -7,6 +7,22 @@
     tools:context="advancedtech.nglabornetzgeraet.PowerSupplyConnecting">
 
     <Button
+        android:id="@+id/button7"
+        android:layout_width="32dp"
+        android:layout_height="35dp"
+        android:text="-"
+        tools:layout_editor_absoluteX="123dp"
+        tools:layout_editor_absoluteY="209dp" />
+
+    <Button
+        android:id="@+id/button8"
+        android:layout_width="32dp"
+        android:layout_height="35dp"
+        android:text="+"
+        tools:layout_editor_absoluteX="91dp"
+        tools:layout_editor_absoluteY="209dp" />
+
+    <Button
         android:layout_width="139dp"
         android:layout_height="36dp"
         android:background="@drawable/colored_unclickable_button"
@@ -24,9 +40,109 @@
         tools:layout_editor_absoluteX="121dp"
         app:layout_constraintHorizontal_bias="0.502" />
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/channel_2"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        tools:layout_editor_absoluteX="262dp"
+        tools:layout_editor_absoluteY="124dp" />
 
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/channel_1"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        tools:layout_editor_absoluteX="43dp"
+        tools:layout_editor_absoluteY="124dp" />
 
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="48dp"
+        android:layout_height="29dp"
+        android:text="@string/example_current_channel_2"
+        android:background="@drawable/textbox_with_borders"
+        tools:layout_editor_absoluteX="226dp"
+        tools:layout_editor_absoluteY="261dp" />
 
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="51dp"
+        android:layout_height="29dp"
+        android:background="@drawable/textbox_with_borders"
+        android:text="@string/example_current_channel_1"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="261dp" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="50dp"
+        android:layout_height="28dp"
+        android:background="@drawable/textbox_with_borders"
+        android:text="@string/example_voltage_channel_1"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="214dp" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:text="@string/example_voltage_channel_2"
+        android:background="@drawable/textbox_with_borders"
+        tools:layout_editor_absoluteX="226dp"
+        tools:layout_editor_absoluteY="214dp" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="32dp"
+        android:layout_height="35dp"
+        android:text="-"
+        tools:layout_editor_absoluteX="123dp"
+        tools:layout_editor_absoluteY="261dp" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="32dp"
+        android:layout_height="35dp"
+        android:text="-"
+        tools:layout_editor_absoluteX="329dp"
+        tools:layout_editor_absoluteY="261dp" />
+
+    <Button
+        android:id="@+id/button9"
+        android:layout_width="32dp"
+        android:layout_height="35dp"
+        android:text="-"
+        tools:layout_editor_absoluteX="336dp"
+        tools:layout_editor_absoluteY="214dp" />
+
+    <Button
+        android:id="@+id/button10"
+        android:layout_width="32dp"
+        android:layout_height="35dp"
+        android:text="+"
+        tools:layout_editor_absoluteX="297dp"
+        tools:layout_editor_absoluteY="214dp" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="32dp"
+        android:layout_height="35dp"
+        android:text="+"
+        tools:layout_editor_absoluteX="297dp"
+        tools:layout_editor_absoluteY="261dp" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="32dp"
+        android:layout_height="35dp"
+        android:text="+"
+        tools:layout_editor_absoluteX="91dp"
+        tools:layout_editor_absoluteY="261dp" />
 
 
 </android.support.constraint.ConstraintLayout>

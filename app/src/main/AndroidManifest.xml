@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".Devicesist"
+            android:name=".DeviceList"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -32,10 +32,10 @@
         <activity
             android:name=".Settings"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".Devicesist">
+            android:parentActivityName=".DeviceList">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="advancedtech.nglabornetzgeraet.Devicesist" />
+                android:value="advancedtech.nglabornetzgeraet.DeviceList" />
         </activity>
         <activity android:name=".PowerSupplyConnecting"></activity>
     </application>
