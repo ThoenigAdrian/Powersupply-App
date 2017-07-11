@@ -240,7 +240,7 @@ public class DeviceList extends AppCompatActivity{
         {
             JSONObject value = entry.getValue();
             try {
-                data.add(value.getString("ID"));
+                data.add("Netzgerät (ID: " + value.getString("ID") + ")");
             } catch (JSONException e) {
                 Toast.makeText(this, "JSON Exception in updateDeviceList", Toast.LENGTH_LONG).show();
             }

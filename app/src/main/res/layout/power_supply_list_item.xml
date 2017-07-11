@@ -1,35 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="horizontal" xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal" xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="40dp"
+    android:layout_marginStart="0dp"
+    app:layout_constraintLeft_toLeftOf="parent"
     android:descendantFocusability="blocksDescendants">
-
 
     <ImageView
         android:id="@+id/powerSupplyIcon"
-        android:layout_width="74dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:layout_weight="0.21"
+        android:layout_width="40dp"
+        android:layout_height="0dp"
         android:background="@drawable/textbox_with_borders"
-
-        app:srcCompat="@android:drawable/alert_dark_frame" />
+        app:srcCompat="@android:drawable/alert_dark_frame"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/powerSupplyInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="@drawable/textbox_with_borders"
-        android:layout_gravity="start"
-        android:layout_weight="1"
-        android:text="" />
+        android:text="Netzgerät "
+        android:gravity="center"
+        app:layout_constraintLeft_toRightOf="@+id/powerSupplyIcon"
+        app:layout_constraintRight_toLeftOf="@+id/connectionTypeSymbol"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/connectionTypeSymbol"
-        android:layout_width="74dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
+        android:layout_width="40dp"
+        android:layout_height="0dp"
         android:background="@drawable/textbox_with_borders"
-        app:srcCompat="@drawable/ic_wifi_connection_signal_symbol" />
-</LinearLayout>
+        app:srcCompat="@drawable/ic_wifi_connection_signal_symbol"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintBottom_creator="1" />
+
+</android.support.constraint.ConstraintLayout>

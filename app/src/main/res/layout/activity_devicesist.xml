@@ -21,7 +21,9 @@
     </android.support.design.widget.AppBarLayout>
 
 
-    <include layout="@layout/content_devicesist" />
+    <include layout="@layout/content_devicesist"
+        android:layout_height="437dp"
+        android:id="@+id/include" />
     <include layout="@layout/power_supply_list_item" />
 
 </android.support.design.widget.CoordinatorLayout>
