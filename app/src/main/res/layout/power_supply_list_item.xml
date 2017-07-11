@@ -8,15 +8,6 @@
     app:layout_constraintLeft_toLeftOf="parent"
     android:descendantFocusability="blocksDescendants">
 
-    <ImageView
-        android:id="@+id/powerSupplyIcon"
-        android:layout_width="40dp"
-        android:layout_height="0dp"
-        android:background="@drawable/textbox_with_borders"
-        app:srcCompat="@android:drawable/alert_dark_frame"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/powerSupplyInfo"
@@ -25,12 +16,13 @@
         android:background="@drawable/textbox_with_borders"
         android:text="Netzgerät "
         android:gravity="center"
-        app:layout_constraintLeft_toRightOf="@+id/powerSupplyIcon"
-        app:layout_constraintRight_toLeftOf="@+id/connectionTypeSymbol"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintBottom_creator="1"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintRight_toLeftOf="@+id/connectionTypeSymbol"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        />
 
     <ImageView
         android:id="@+id/connectionTypeSymbol"
@@ -38,10 +30,11 @@
         android:layout_height="0dp"
         android:background="@drawable/textbox_with_borders"
         app:srcCompat="@drawable/ic_wifi_connection_signal_symbol"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_constraintTop_creator="1"
-        tools:layout_constraintBottom_creator="1" />
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintRight_toRightOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

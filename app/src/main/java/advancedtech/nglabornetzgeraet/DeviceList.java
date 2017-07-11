@@ -267,7 +267,6 @@ public class DeviceList extends AppCompatActivity{
                 LayoutInflater inflater = LayoutInflater.from(getContext());
                 convertView = inflater.inflate(layout, parent, false);
                 ViewHolder viewHolder = new ViewHolder();
-                viewHolder.powerSupplyIcon = (ImageView) convertView.findViewById(R.id.powerSupplyIcon);
                 viewHolder.powerSupplyInfo = (TextView) convertView.findViewById(R.id.powerSupplyInfo);
                 viewHolder.connectionTypeSymbol = (ImageView) convertView.findViewById(R.id.connectionTypeSymbol);
 
@@ -284,7 +283,6 @@ public class DeviceList extends AppCompatActivity{
     }
 
     private class ViewHolder{
-        ImageView powerSupplyIcon;
         TextView powerSupplyInfo;
         ImageView connectionTypeSymbol;
     }
