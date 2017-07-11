@@ -1,5 +1,6 @@
 package advancedtech.nglabornetzgeraet;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
@@ -7,6 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -36,6 +41,7 @@ public class PowerSupplyConnecting extends AppCompatActivity {
         voltageCurrentButtons.add(decrease_voltage_channel_1);
         voltageCurrentButtons.add(decrease_voltage_channel_2);
 
+
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -55,5 +61,13 @@ public class PowerSupplyConnecting extends AppCompatActivity {
         Button connectionStatus = (Button) findViewById(R.id.connectionStatus);
         connectionStatus.setText(R.string.connected_string);
         connectionStatus.setBackgroundColor(Color.parseColor("#0ece1b"));
+        EditText liveDataChannel1 = (EditText) findViewById(R.id.live_data_content_channel1);
+        EditText liveDataChannel2 = (EditText) findViewById(R.id.live_data_content_channel2);
+        liveDataChannel1.setVisibility(View.VISIBLE);
+        liveDataChannel2.setVisibility(View.VISIBLE);
+        ((TextView) findViewById(R.id.voltage_channel_1)).setTextColor(Color.BLACK);
+        ((TextView) findViewById(R.id.voltage_channel_2)).setTextColor(Color.BLACK);
+        ((TextView) findViewById(R.id.current_channel_1)).setTextColor(Color.BLACK);
+        ((TextView) findViewById(R.id.current_channel_2)).setTextColor(Color.BLACK);
     }
 }

@@ -14,14 +14,13 @@
         android:text="-"
         app:layout_constraintTop_toTopOf="@+id/increase_voltage_channel_1"
         android:layout_marginTop="0dp"
-        app:layout_constraintLeft_toRightOf="@+id/increase_voltage_channel_1"
-        android:layout_marginLeft="7dp" />
+        app:layout_constraintLeft_toRightOf="@+id/increase_voltage_channel_1"  />
 
     <Button
         android:id="@+id/increase_voltage_channel_1"
         android:layout_width="36dp"
         android:layout_height="40dp"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="16dp"
         android:text="+"
         app:layout_constraintLeft_toRightOf="@+id/voltage_channel_1"
         android:layout_marginTop="64dp"
@@ -69,13 +68,12 @@
         tools:layout_constraintBottom_creator="1"
         android:layout_marginStart="43dp"
         tools:layout_constraintLeft_creator="1"
-        android:layout_marginLeft="32dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginTop="64dp"
         app:layout_constraintTop_toBottomOf="@+id/connectionStatus" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/current_channel_2"
         android:layout_width="50dp"
         android:layout_height="30dp"
         android:background="@drawable/textbox_with_borders"
@@ -87,49 +85,46 @@
 
     <TextView
         android:id="@+id/current_channel_1"
-        android:layout_width="51dp"
+        android:layout_width="50dp"
         android:layout_height="30dp"
-        android:layout_marginEnd="24dp"
         android:layout_marginStart="0dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/textbox_with_borders"
         android:text="@string/example_current_channel_1"
-        app:layout_constraintTop_toBottomOf="@+id/voltage_channel_1"
         app:layout_constraintLeft_toLeftOf="@+id/voltage_channel_1"
-        android:layout_marginLeft="16dp" />
+        app:layout_constraintTop_toBottomOf="@+id/voltage_channel_1" />
 
     <TextView
         android:id="@+id/voltage_channel_1"
-        android:layout_width="49dp"
+        android:layout_width="50dp"
         android:layout_height="30dp"
         android:layout_marginBottom="0dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="60dp"
         android:background="@drawable/textbox_with_borders"
         android:text="@string/example_voltage_channel_1"
         app:layout_constraintBottom_toBottomOf="@+id/increase_current_channel_1"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="@+id/current_channel_1"
+        app:layout_constraintTop_toBottomOf="@+id/channel_1_heading"
+        app:layout_constraintVertical_bias="0.187"
         tools:layout_constraintBottom_creator="1"
         tools:layout_constraintLeft_creator="1"
         tools:layout_constraintRight_creator="1"
-        tools:layout_constraintTop_creator="1"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="54dp"
-        app:layout_constraintTop_toBottomOf="@+id/channel_1_heading"
-        app:layout_constraintVertical_bias="0.19" />
+        tools:layout_constraintTop_creator="1" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/voltage_channel_2"
         android:layout_width="50dp"
         android:layout_height="30dp"
         android:text="@string/example_voltage_channel_2"
         android:background="@drawable/textbox_with_borders"
         android:layout_marginStart="128dp"
-        android:layout_marginEnd="109dp"
-        app:layout_constraintLeft_toRightOf="@+id/voltage_channel_1"
         app:layout_constraintTop_toTopOf="@+id/voltage_channel_1"
-        android:layout_marginLeft="128dp"
-        android:layout_marginTop="0dp" />
+        android:layout_marginTop="0dp"
+        app:layout_constraintLeft_toRightOf="@+id/voltage_channel_1"
+        android:layout_marginLeft="8dp" />
 
     <Button
         android:id="@+id/decrease_current_channel_1"
@@ -145,42 +140,45 @@
         android:id="@+id/decrease_current_channel_2"
         android:layout_width="36dp"
         android:layout_height="40dp"
-        android:layout_marginStart="128dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="0dp"
         android:text="-"
-        app:layout_constraintLeft_toRightOf="@+id/decrease_current_channel_1"
-        app:layout_constraintTop_toTopOf="@+id/decrease_current_channel_1" />
+        app:layout_constraintLeft_toRightOf="@+id/increase_current_channel_2"
+        app:layout_constraintTop_toTopOf="@+id/decrease_current_channel_1"
+        android:layout_marginLeft="0dp" />
 
     <Button
         android:id="@+id/decrease_voltage_channel_2"
         android:layout_width="36dp"
         android:layout_height="40dp"
         android:layout_marginEnd="1dp"
-        android:layout_marginStart="128dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="0dp"
         android:text="-"
-        app:layout_constraintLeft_toRightOf="@+id/decrease_voltage_channel_1"
+        app:layout_constraintLeft_toRightOf="@+id/increase_voltage_channel_2"
         app:layout_constraintTop_toTopOf="@+id/decrease_voltage_channel_1" />
 
     <Button
         android:id="@+id/increase_voltage_channel_2"
         android:layout_width="36dp"
         android:layout_height="40dp"
-        android:layout_marginStart="128dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="0dp"
         android:text="+"
-        app:layout_constraintLeft_toRightOf="@+id/increase_voltage_channel_1"
-        app:layout_constraintTop_toTopOf="@+id/increase_voltage_channel_1" />
+        app:layout_constraintTop_toTopOf="@+id/increase_voltage_channel_1"
+        app:layout_constraintLeft_toRightOf="@+id/voltage_channel_2"
+        android:layout_marginLeft="8dp" />
 
     <Button
         android:id="@+id/increase_current_channel_2"
         android:layout_width="36dp"
         android:layout_height="40dp"
-        android:layout_marginStart="128dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="0dp"
         android:text="+"
-        app:layout_constraintLeft_toRightOf="@+id/increase_current_channel_1"
-        app:layout_constraintTop_toTopOf="@+id/increase_current_channel_1" />
+        app:layout_constraintTop_toTopOf="@+id/increase_current_channel_1"
+        app:layout_constraintLeft_toRightOf="@+id/current_channel_2"
+        android:layout_marginLeft="8dp" />
 
     <Button
         android:id="@+id/increase_current_channel_1"
@@ -191,6 +189,38 @@
         android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@+id/increase_voltage_channel_1"
         app:layout_constraintLeft_toLeftOf="@+id/increase_voltage_channel_1" />
+
+    <EditText
+        android:id="@+id/live_data_content_channel1"
+        android:layout_width="140dp"
+        android:layout_height="83dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="96dp"
+        android:background="@drawable/textbox_with_borders"
+        android:ems="10"
+        android:focusable="false"
+        android:inputType="textMultiLine"
+        android:text="@string/live_data_content"
+        android:visibility="invisible"
+        app:layout_constraintLeft_toLeftOf="@+id/current_channel_1"
+        app:layout_constraintTop_toBottomOf="@+id/current_channel_1" />
+
+    <EditText
+        android:id="@+id/live_data_content_channel2"
+        android:layout_width="140dp"
+        android:layout_height="83dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="96dp"
+        android:background="@drawable/textbox_with_borders"
+        android:ems="10"
+        android:focusable="false"
+        android:inputType="textMultiLine"
+        android:text="@string/live_data_content"
+        android:visibility="invisible"
+        app:layout_constraintLeft_toLeftOf="@+id/current_channel_2"
+        app:layout_constraintTop_toBottomOf="@+id/current_channel_2" />
+
+
 
 
 </android.support.constraint.ConstraintLayout>
