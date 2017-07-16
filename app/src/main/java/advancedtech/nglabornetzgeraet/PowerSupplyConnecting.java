@@ -28,10 +28,21 @@ public class PowerSupplyConnecting extends AppCompatActivity {
 
 
     ArrayList<Button> voltageCurrentButtons = new ArrayList<>();
-    Socket powerSupplyConnection;
+    HighLevelCommunicationInterface hlc;
     String response;
-    String ip="192.168.0.200";
-    int port=2223;
+
+    private class asyncSendToPowerSupply extends AsyncTask<String, Void, String>
+    {
+        @Override
+        protected String doInBackground(String... params) {
+            hlc.send
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            onMessageSent();
+        }
+    }
 
     private class connectToPowerSupply extends AsyncTask<Void,Void,Void> {
 
@@ -80,6 +91,8 @@ public class PowerSupplyConnecting extends AppCompatActivity {
         }
     }
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +116,11 @@ public class PowerSupplyConnecting extends AppCompatActivity {
 
         connectToPowerSupply asyncConnectTask = new connectToPowerSupply();
         asyncConnectTask.execute();
-        
+
+
+    }
+
+    public void onMessageSent(String response){
 
     }
 

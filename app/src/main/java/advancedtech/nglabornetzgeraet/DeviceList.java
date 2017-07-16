@@ -41,24 +41,11 @@ public class DeviceList extends AppCompatActivity{
     private ArrayList<String> data = new ArrayList<>();
     private DatagramSocket udpListenSocket;
     private Map<Integer, JSONObject> availablePowerSupplies = new HashMap<>();
-    private Handler beaconHandler;
+
     WifiManager.WifiLock wifiLock;
     WifiManager.MulticastLock wifiMulticastLock;
 
-    Runnable beaconCollector = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                collectBeacons(); //this function can change value of refreshDeviceListPeriod.
-                updateDeviceList();
-            } finally {
-                // 100% guarantee that this always happens, even if
-                // your update method throws an exception
-                int refreshDeviceListPeriod = 2000;
-                beaconHandler.postDelayed(beaconCollector, refreshDeviceListPeriod);
-            }
-        }
-    };
+
 
 
     @Override
@@ -79,9 +66,6 @@ public class DeviceList extends AppCompatActivity{
             }
         });
 
-        initializeWlan();
-        beaconHandler = new Handler();
-        startRepeatingTask();
 
 
     }
@@ -89,71 +73,13 @@ public class DeviceList extends AppCompatActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopRepeatingTask();
     }
 
-    void startRepeatingTask() {
-        beaconCollector.run();
-    }
-
-    void stopRepeatingTask() {
-        beaconHandler.removeCallbacks(beaconCollector);
-    }
-
-    private void collectBeacons()
-    {
-        byte[] receivedata = new byte[1024];
-        DatagramPacket recv_packet = new DatagramPacket(receivedata, receivedata.length);
-        try{
-            udpListenSocket.setSoTimeout(100);
-        }
-        catch (SocketException e)
-        {
-            Toast.makeText(this, "Can't set udp timeout for whatever reason : " + e.toString(), Toast.LENGTH_LONG).show();
-        }
-        while(true) {
-            try {
-                udpListenSocket.receive(recv_packet);
-                String recv_string = new String(recv_packet.getData());
-                JSONObject reader;
-                try {
-                    reader = new JSONObject(recv_string);
-                    String id = reader.getString("ID");
-                    Integer id_ = Integer.parseInt(id);
-                    availablePowerSupplies.put(id_, reader);
-                } catch (JSONException e) {
-                    Toast.makeText(this, "Can't set udp timeout for whatever reason : " + e.toString(), Toast.LENGTH_LONG).show();
-                }
 
 
-            } catch (SocketTimeoutException e) {
-                break;
-            } catch (IOException e) {
-                Toast.makeText(this, "Can't receive from UDP Socket becuase" + e.toString(), Toast.LENGTH_LONG).show();
-                break;
-            }
-        }
-    }
 
-    private void initializeWlan()
-    {
-        WifiManager wlan_manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (wlan_manager !=null){
-            wifiLock = wlan_manager.createWifiLock("nglabornetzgeraetlock");
-            wifiLock.acquire();
-            wifiMulticastLock = wlan_manager.createMulticastLock("nglabornetzgeraetlock2");
-            wifiMulticastLock.setReferenceCounted(false);
-            wifiMulticastLock.acquire();
-        }
-        try
-        {
-            udpListenSocket = new DatagramSocket(5455);
-        }
-        catch (SocketException e)
-        {
-            e.printStackTrace();
-        }
-    }
+
+
 
 
     @Override
