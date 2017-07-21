@@ -2,19 +2,17 @@ package advancedtech.nglabornetzgeraet;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
-import android.os.Parcelable;
-import android.util.Log;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -26,10 +24,11 @@ import java.util.ArrayList;
 
 public class LowLevelCommunication {
 
-    private BeaconList beacons;
+    private BeaconList beacons = new BeaconList();
     private ResultList results;
-    private Socket PowerSupplyConnection;
+    private Socket powerSupplyConnection;
     private String powerSupplyIPAddress;
+    private String powerSupplybluetoothAddress;
 
     // This is a bluetooth UUID which can freely be choosen to identify applications
     // In this case all Power Supplies will use the same UUID so that the app can distinguish them
@@ -38,14 +37,27 @@ public class LowLevelCommunication {
 
     private DatagramSocket udpBeaconListener;
     private BluetoothAdapter bluetoothAdapter;
-    private ArrayList<BluetoothDevice> foundBluetoothDevices;
+    private ArrayList<BluetoothDevice> foundBluetoothDevices = new ArrayList<>();;
     private int powerSupplyPort;
     private Handler beaconHandler;
-    private int sendTimeout = 5;
+    private int connectTimeoutMs = 10*1000;
+    private int sendTimeoutSec = 5;
     private boolean error_occured = false;
     private String error_string = "";
     private Context ApplicationContext;
+    private boolean wifiAdapterAvailable = false;
+    private boolean wifiEnabled = false;
+    private boolean bluetoothAdapterAvailable = false;
+    private boolean bluetoothEnabled = false;
+    private boolean beaconCollecotrRunning = false;
+    DataOutputStream powerSupplyOutputStream;
+    BufferedReader powerSupplyInputStream;
+    private String connectionType;
 
+    private WifiManager.WifiLock wifiLock;
+    private WifiManager.MulticastLock wifiMulticastLock;
+
+    /*
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -62,26 +74,137 @@ public class LowLevelCommunication {
                 Parcelable[] uuidExtra = intent.getParcelableExtra(BluetoothDevice.EXTRA_UUID);
                 if(uuidExtra != null){
                     for (Parcelable p : uuidExtra){
-                        Parcelable a = p;
+                        Parcelable a = p; // Just a debug line
                         if (p.toString() == powerSupplyUUID){
-                            Beacon beacon = new Beacon();
+                            Beacon beacon = new Beacon(deviceExtra.getName().split("Y")[0], "1", null, null, Integer.parseInt(deviceExtra.getName().split("Y")[1]), System.currentTimeMillis(), "", deviceExtra.getAddress(), "Bluetooth");
                             beacons.add(beacon);
                         }
                     }
                 }
             }
         }
-    };
+    };*/
 
-    WifiManager.WifiLock wifiLock;
-    WifiManager.MulticastLock wifiMulticastLock;
-
-    public LowLevelCommunication(Beacon powerSupplyBeacon, Context ctx){
+    public LowLevelCommunication(Context ctx){
         ApplicationContext = ctx;
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        bluetoothAdapter.startDiscovery();
+        beaconHandler = new Handler();
+        updateConnectionPossibilities();
+        initializeBluetooth();
+        initializeWIFI();
         startCollectingBeacons();
-        initializeWlan();
+
+    }
+
+    public String connectToPowerSupply(Beacon powerSupplyBeacon){
+        String result = "Invalid connection type";
+        if(powerSupplyBeacon.connectionType.equals("WIFI")){
+            powerSupplyPort = powerSupplyBeacon.port;
+            powerSupplyIPAddress = powerSupplyBeacon.ip;
+            result = connectToPowerSupplyViaWIFI();
+        } else if (powerSupplyBeacon.connectionType.equals("Bluetooth")){
+            powerSupplybluetoothAddress = powerSupplyBeacon.bluetoothAddress;
+            result = connectToPowerSupplyViaBluetooth();
+        } else if(powerSupplyBeacon.connectionType.equals("Server")){
+            powerSupplyPort = powerSupplyBeacon.port;
+            powerSupplyIPAddress = powerSupplyBeacon.ip;
+            result = connectToPowerSupplyViaServer();
+        }
+        return result;
+    }
+
+    private void initializeBluetooth(){
+        if(bluetoothAdapterAvailable){
+            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            bluetoothAdapter.startDiscovery();
+        }
+    }
+
+    private void updateConnectionPossibilities(){
+        updateBluetoothAdapterAvailable();
+        updateWifiAdapterAvailable();
+        updateBluetoothEnabled();
+        updateWifiEnabled();
+    }
+
+    private String connectToPowerSupplyViaServer() {
+        return "NotImplementedYet";
+    }
+
+    private String connectToPowerSupplyViaBluetooth() {
+        return "NotImplementedYet";
+
+    }
+
+    private String connectToPowerSupplyViaWIFI() {
+        String result = "couldn't connect to power Supply";
+        String response;
+
+        try {
+            powerSupplyConnection = new Socket();
+            powerSupplyConnection.connect(new InetSocketAddress(powerSupplyIPAddress, powerSupplyPort) , connectTimeoutMs);
+            powerSupplyOutputStream = new DataOutputStream(powerSupplyConnection.getOutputStream());
+            powerSupplyInputStream = new BufferedReader(new InputStreamReader(powerSupplyConnection.getInputStream()));
+        } catch (IOException e) {
+            return result + e.toString();
+
+        } catch (Exception e) {
+            return result + e.toString();
+        }
+
+        try {
+            response = powerSupplyInputStream.readLine();
+            if (response == null) {
+                return result + "couldn't read from tcp stream";
+            }
+        } catch (Exception e) {
+            return result + e.toString();
+        }
+        return response;
+    }
+
+
+    public boolean isWifiAdapterAvailable(){
+        return wifiAdapterAvailable;
+    }
+
+    public boolean isBluetoothAdapterAvailable(){
+        return bluetoothAdapterAvailable;
+    }
+
+    public boolean isWifiEnabled(){
+        return wifiEnabled;
+    }
+
+    public boolean isBluetoothEnabled(){
+        return bluetoothEnabled;
+    }
+
+
+    private void updateWifiEnabled() {
+        WifiManager wifi = (WifiManager) ApplicationContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiEnabled = wifi != null && wifi.isWifiEnabled();
+    }
+
+    private void updateWifiAdapterAvailable(){
+        WifiManager wifi = (WifiManager) ApplicationContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiAdapterAvailable = wifi != null;
+    }
+
+    private void updateBluetoothAdapterAvailable(){
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        bluetoothAdapterAvailable = bluetoothAdapter != null;
+    }
+
+    private void updateBluetoothEnabled(){
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+
+        } else {
+            if (bluetoothAdapter.isEnabled()) {
+                bluetoothEnabled = true;
+            }
+        }
+        bluetoothEnabled =  false;
     }
 
     private Runnable beaconCollector = new Runnable() {
@@ -92,19 +215,19 @@ public class LowLevelCommunication {
             } finally {
                 // 100% guarantee that this always happens, even if
                 // your update method throws an exception
-                int refreshDeviceListPeriod = 2000;
+                int refreshDeviceListPeriod = 500;
                 beaconHandler.postDelayed(beaconCollector, refreshDeviceListPeriod);
             }
         }
     };
 
-    private void initializeWlan()
+    private void initializeWIFI()
     {
-        WifiManager wlan_manager = (WifiManager) ApplicationContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (wlan_manager !=null){
-            wifiLock = wlan_manager.createWifiLock("nglabornetzgeraetlock");
+        WifiManager wifiManager = (WifiManager) ApplicationContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager !=null){
+            wifiLock = wifiManager.createWifiLock("nglabornetzgeraetlock");
             wifiLock.acquire();
-            wifiMulticastLock = wlan_manager.createMulticastLock("nglabornetzgeraetlock2");
+            wifiMulticastLock = wifiManager.createMulticastLock("nglabornetzgeraetlock2");
             wifiMulticastLock.setReferenceCounted(false);
             wifiMulticastLock.acquire();
         }
@@ -126,7 +249,6 @@ public class LowLevelCommunication {
         beaconHandler.removeCallbacks(beaconCollector);
     }
 
-    //stopCollectingBeacons();
 
     private void collectBeacons()
     {
@@ -143,14 +265,12 @@ public class LowLevelCommunication {
             try {
                 udpBeaconListener.receive(recv_packet);
                 String recv_string = new String(recv_packet.getData());
-                JSONObject reader;
                 try {
-                    reader = new JSONObject(recv_string);
-                    beacons.add(new Beacon(reader));
-                } catch (JSONException e) {
-                    //Toast.makeText(this, "Can't set udp timeout for whatever reason : " + e.toString(), Toast.LENGTH_LONG).show();
+                    Beacon b = new Beacon(recv_string, "WIFI");
+                    beacons.put(b.ID, b);
+                } catch (IllegalArgumentException e) {
+                    break;
                 }
-
 
             } catch (SocketTimeoutException e) {
                 break;
@@ -162,8 +282,9 @@ public class LowLevelCommunication {
     }
 
 
-
     public BeaconList getBeacons() {
+        if(!beaconCollecotrRunning)
+            startCollectingBeacons();
         return beacons;
     }
 
@@ -171,26 +292,40 @@ public class LowLevelCommunication {
         return results;
     }
 
-    public void sendMessageToPowerSupply(String message, callbackInterface cI){
-        // do stuff
-        cI.onReceivedResponseFromPowerSupply();
-
-    }
-    public void sendMessageToPowerSupply(String message){
-        // do stuff
-
-    }
-
-    public int connect_to_power_supply()
-    {
-
+    public String sendMessageToPowerSupply(String message){
+        String response = "Invalid connection type";
+        if(connectionType.equals("WIFI"))
+            return sendMessageToPowerSupplyViaWIFI(message);
+        else if (connectionType.equals("Bluetooth"))
+            return sendMessageToPowerSupplyViaBluetooth(message);
+        else if (connectionType.equals("Server"))
+            return sendMessageToPowerSupplyViaServer(message);
+        return response;
     }
 
-    private void bluetoothSend(String message){
+    private String sendMessageToPowerSupplyViaWIFI(String message){
+        String response;
+        String result = "Couldn't send message";
+        try {
+            powerSupplyOutputStream.writeChars(message);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(powerSupplyConnection.getInputStream()));
+            response = reader.readLine();
+            if (response == null) {
+                return result + "couldn't read from tcp stream";
+            }
+        } catch (Exception e) {
+            return result + e.toString();
+        }
+        return response;
+    }
+
+    private String sendMessageToPowerSupplyViaBluetooth(String message){
+        return "NotImplementedYet";
 
     }
 
-    private void wifiSend(String message){
-
+    private String sendMessageToPowerSupplyViaServer(String message){
+        return "NotImplementedYet";
     }
+
 }

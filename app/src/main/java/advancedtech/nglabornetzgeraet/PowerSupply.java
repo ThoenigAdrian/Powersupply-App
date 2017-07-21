@@ -15,7 +15,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class PowerSupplyConnecting extends AppCompatActivity {
+public class PowerSupply extends AppCompatActivity {
 
 
     ArrayList<Button> voltageCurrentButtons = new ArrayList<>();
@@ -49,7 +49,7 @@ public class PowerSupplyConnecting extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void a) {
             if(hlc.isPowerSupplyConnected())
-                onConnectionSuccessfull();
+                onConnectionSuccessfull(error_string);
             else
                 onConnectionFailed(error_string);
         }
@@ -91,7 +91,7 @@ public class PowerSupplyConnecting extends AppCompatActivity {
         finish();
     }
 
-    public void onConnectionSuccessfull(){
+    public void onConnectionSuccessfull(String connectionAcceptResponse){
 
         for(Button controlButton : voltageCurrentButtons){
             controlButton.setClickable(true);
@@ -108,8 +108,80 @@ public class PowerSupplyConnecting extends AppCompatActivity {
         ((TextView) findViewById(R.id.voltage_channel_2)).setTextColor(Color.BLACK);
         ((TextView) findViewById(R.id.current_channel_1)).setTextColor(Color.BLACK);
         ((TextView) findViewById(R.id.current_channel_2)).setTextColor(Color.BLACK);
-        setAllData(response);
+        setAllData(connectionAcceptResponse);
 
+    }
+
+
+
+    private void setAll(Channel channel1, Channel channel2){
+        asyncSendToPowerSupply a = new asyncSendToPowerSupply();
+        String command = "set_all";
+        JSONObject message = new JSONObject();
+        try{
+            message.put("command", command);
+
+            JSONObject channel1_data = new JSONObject();
+            channel1_data.put("voltage", channel1.getVoltage());
+            channel1_data.put("voltage", channel1.geCurrent());
+
+            JSONObject channel2_data = new JSONObject();
+            channel2_data.put("voltage", channel2.getVoltage());
+            channel2_data.put("voltage", channel2.geCurrent());
+
+            message.put("channel1", channel1_data);
+            message.put("channel2", channel2_data);
+        } catch (JSONException e){
+
+        }
+        a.doInBackground(message.toString());
+
+    }
+
+    private void setVoltage(Integer channelNr, Float voltage){
+        asyncSendToPowerSupply a = new asyncSendToPowerSupply();
+        String command = "set_voltage";
+        JSONObject message = new JSONObject();
+        try{
+            message.put("command", command);
+            message.put("channel", channelNr.toString());
+            message.put("value", String.format(java.util.Locale.US, "%.1f", voltage));
+        } catch (JSONException e) {
+
+        }
+        a.doInBackground(message.toString());
+    }
+
+    private void setCurrent(Integer channelNr, Float current){
+        asyncSendToPowerSupply a = new asyncSendToPowerSupply();
+        String command = "set_current";
+        JSONObject message = new JSONObject();
+        try{
+            message.put("command", command);
+            message.put("channel", channelNr.toString());
+            message.put("value", String.format(java.util.Locale.US, "%.1f", current));
+        } catch (JSONException e) {
+
+        }
+        a.doInBackground(message.toString());
+    }
+
+    private class Channel{
+        private Float voltage;
+        private Float current;
+
+        public Channel(Float voltage, Float current){
+            this.voltage = voltage;
+            this.current = current;
+        }
+
+        public String getVoltage() {
+            return String.format(java.util.Locale.US, "%.1f", voltage);
+        }
+
+        public String geCurrent() {
+            return String.format(java.util.Locale.US, "%.1f", current);
+        }
     }
 
     public  void setAllData(String resp)

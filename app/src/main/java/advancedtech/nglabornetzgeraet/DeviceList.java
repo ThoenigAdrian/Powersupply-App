@@ -1,15 +1,13 @@
 package advancedtech.nglabornetzgeraet;
-import android.os.Handler;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
@@ -22,65 +20,60 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 public class DeviceList extends AppCompatActivity{
 
     private ArrayList<String> data = new ArrayList<>();
-    private DatagramSocket udpListenSocket;
-    private Map<Integer, JSONObject> availablePowerSupplies = new HashMap<>();
+    private HighLevelCommunicationInterface communicationInterface;
+    public BeaconEvaluator beaconEvaluator = new BeaconEvaluator();
+    private android.os.Handler deviceListUpdateHandler = new android.os.Handler();
+    private ArrayList<Beacon> availablePowerSupplies = new ArrayList<>();
 
-    WifiManager.WifiLock wifiLock;
-    WifiManager.MulticastLock wifiMulticastLock;
-
-
-
+    private Runnable deviceListUpdater = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                updateDeviceList(); //this function can change value of refreshDeviceListPeriod.
+            } finally {
+                // 100% guarantee that this always happens, even if
+                // your update method throws an exception
+                int refreshDeviceListPeriod = 5000;
+                deviceListUpdateHandler.postDelayed(deviceListUpdater, refreshDeviceListPeriod);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        communicationInterface = HighLevelCommunicationInterface.getInstance();
         setContentView(R.layout.activity_devicesist);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         ListView lv = (ListView) findViewById(R.id.listview);
-        lv.setAdapter(new MyListAdapter(this, R.layout.power_supply_list_item, data));
+        lv.setAdapter(new powerSupplyListAdapter(this, R.layout.power_supply_list_item, data));
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(DeviceList.this, PowerSupplyConnecting.class);
+                deviceListUpdateHandler.removeMessages(0);
+                Intent intent = new Intent(DeviceList.this, PowerSupply.class);
+                intent.putExtra("beaconInfo", availablePowerSupplies.get(position).toJsonString()); // makes the selected Power Supply Info available for the next Activity
                 startActivity(intent);
             }
         });
-
-
-
+        communicationInterface.setContext(getApplicationContext());
+        deviceListUpdateHandler.post(deviceListUpdater); // updates the deviceList
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
-
-
-
-
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -100,7 +93,6 @@ public class DeviceList extends AppCompatActivity{
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -110,76 +102,47 @@ public class DeviceList extends AppCompatActivity{
         startActivity(intent);
     }
 
-    public boolean wifiEnabled() {
-        WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        return wifi != null && wifi.isWifiEnabled();
-    }
 
-    public boolean wifiAdapterAvailable(){
-        WifiManager wifi = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        return wifi != null;
-    }
-
-    public boolean bluetoothAdapterAvailable(){
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        return bluetoothAdapter != null;
-    }
-
-    public boolean bluetoothConnectivityAvailable(){
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
-
-        } else {
-            if (bluetoothAdapter.isEnabled()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     public void onConnect(View view) {
-        if(bluetoothAdapterAvailable())
+        if(communicationInterface.isBluetoothAdapterAvailable())
             Toast.makeText(this, "Bluetooth Adapter Available", Toast.LENGTH_LONG).show();
         else
             Toast.makeText(this, "Bluetooth Adapter Not Available", Toast.LENGTH_LONG).show();
-        if(bluetoothConnectivityAvailable())
+        if(communicationInterface.isBluetoothEnabled())
             Toast.makeText(this, "Bluetooth Connectivity Available", Toast.LENGTH_LONG).show();
         else
             Toast.makeText(this, "Bluetooth Connectivity Not Available", Toast.LENGTH_LONG).show();
-        if (wifiAdapterAvailable())
+        if (communicationInterface.isWifiAdapterAvailable())
             Toast.makeText(this, "Wifi Adapter Available", Toast.LENGTH_LONG).show();
         else
             Toast.makeText(this, "Wifi Adapter not available", Toast.LENGTH_LONG).show();
-        if (wifiEnabled())
+        if (communicationInterface.isWifiEnabled())
             Toast.makeText(this, "Wifi Enabled", Toast.LENGTH_LONG).show();
         else
             Toast.makeText(this, "Wifi Disabled", Toast.LENGTH_LONG).show();
 
-        Intent intent = new Intent(this, PowerSupplyConnecting.class);
-        startActivity(intent);
     }
 
     public void updateDeviceList(){
+        Log.v("bla", "startUpdate");
         data = new ArrayList<>();
-        for(Map.Entry<Integer, JSONObject> entry : availablePowerSupplies.entrySet())
-        {
-            JSONObject value = entry.getValue();
-            try {
-                data.add("Netzgerät (ID: " + value.getString("ID") + ")");
-            } catch (JSONException e) {
-                Toast.makeText(this, "JSON Exception in updateDeviceList", Toast.LENGTH_LONG).show();
-            }
-
+        availablePowerSupplies = new ArrayList<>();
+        for (Beacon powerSupply: beaconEvaluator.getAvailablePowerSupplies().values()){
+            availablePowerSupplies.add(powerSupply);
+        }
+        for(Beacon beacon : availablePowerSupplies){
+                data.add("Netzgerät (ID: " + beacon.ID + ")");
         }
         ListView lv = (ListView) findViewById(R.id.listview);
-        lv.setAdapter(new MyListAdapter(this, R.layout.power_supply_list_item, data));
-
+        lv.setAdapter(new powerSupplyListAdapter(this, R.layout.power_supply_list_item, data));
+        Log.v("performanceDebugging", "");
+        Log.v("performanceDebugging", "stopUpdate");
     }
 
-    private class MyListAdapter extends ArrayAdapter<String> {
+    private class powerSupplyListAdapter extends ArrayAdapter<String> {
         private int layout;
-        private MyListAdapter(@NonNull Context context, @LayoutRes int resource, @NonNull List<String> objects) {
+        private powerSupplyListAdapter(@NonNull Context context, @LayoutRes int resource, @NonNull List<String> objects) {
             super(context, resource, objects);
             layout = resource;
         }

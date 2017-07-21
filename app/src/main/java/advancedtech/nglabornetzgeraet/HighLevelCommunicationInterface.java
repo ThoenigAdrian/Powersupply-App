@@ -6,17 +6,16 @@ import android.content.Context;
  * Created by Adrian on 16.07.2017
  */
 
-public class HighLevelCommunicationInterfacee {
-    private static final HighLevelCommunicationInterfacee ourInstance = new HighLevelCommunicationInterfacee();
+public class HighLevelCommunicationInterface {
+    private static final HighLevelCommunicationInterface ourInstance = new HighLevelCommunicationInterface();
     private LowLevelCommunication communicationInterface;
     private boolean powerSupplyConnected = false;
-    Context ctx;
 
-    public static HighLevelCommunicationInterfacee getInstance() {
+    public static HighLevelCommunicationInterface getInstance() {
         return ourInstance;
     }
 
-    private HighLevelCommunicationInterfacee() {
+    private HighLevelCommunicationInterface() {
 
     }
 
@@ -25,14 +24,23 @@ public class HighLevelCommunicationInterfacee {
     }
 
     public String connectToPowerSupply(Beacon beacon){
-        return communicationInterface.connectToPowerSupply(beacon);
+        String result = communicationInterface.connectToPowerSupply(beacon);
+        if(result.startsWith("couldn't connect to power Supply") || result.startsWith("Invalid")){
+            powerSupplyConnected = false;
+        }
+        else{
+            powerSupplyConnected = true;
+        }
+        return result;
     }
 
     public void setContext(Context context){
-        ctx = context;
-        communicationInterface = new LowLevelCommunication((ctx));
+        communicationInterface = new LowLevelCommunication((context));
     }
 
+    public boolean isPowerSupplyConnected(){
+        return powerSupplyConnected;
+    }
 
     public boolean isWifiAdapterAvailable(){
         return communicationInterface.isWifiAdapterAvailable();

@@ -8,11 +8,13 @@ import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -21,6 +23,10 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,6 +45,119 @@ public class Settings extends AppCompatPreferenceActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
+
+    HighLevelCommunicationInterface hlc = HighLevelCommunicationInterface.getInstance();
+
+    private class asyncSendToPowerSupply extends AsyncTask<String, Void, String>
+    {
+        @Override
+        protected String doInBackground(String... params) {
+            return hlc.sendMessageToPowerSupply(params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            onMessageSent(s);
+        }
+    }
+
+    private void removeWifiNetwork(String ssid){
+        asyncSendToPowerSupply a = new asyncSendToPowerSupply();
+        String command = "remove_wifi_network";
+        JSONObject message = new JSONObject();
+        try{
+            message.put("command", command);
+            message.put("ssid", ssid);
+        } catch (JSONException e) {
+
+        }
+        a.doInBackground(message.toString());
+    }
+
+    private void changePassword(String oldPassword, String newPassword){
+        asyncSendToPowerSupply a = new asyncSendToPowerSupply();
+        String command = "change_password";
+        JSONObject message = new JSONObject();
+        try{
+            message.put("command", command);
+            message.put("old_password", oldPassword);
+            message.put("new_password", newPassword);
+        } catch (JSONException e) {
+
+        }
+        a.doInBackground(message.toString());
+    }
+
+    private void addWifiNetwork(String ssid, String password, Integer priority){
+        asyncSendToPowerSupply a = new asyncSendToPowerSupply();
+        String command = "add_wifi_network";
+        JSONObject message = new JSONObject();
+        try{
+            message.put("command", command);
+            message.put("ssid", ssid);
+            message.put("password", password);
+            message.put("priority", priority.toString());
+        } catch (JSONException e) {
+
+        }
+        a.doInBackground(message.toString());
+    }
+
+    private void genericSend(String command, ArrayList<Pair<String, String>> listOfParameters){
+        asyncSendToPowerSupply a = new asyncSendToPowerSupply();
+        JSONObject message = new JSONObject();
+        try{
+            message.put("command", command);
+            for(Pair<String, String> p : listOfParameters){
+                message.put(p.first, p.second);
+            }
+        } catch (JSONException e) {
+
+        }
+        a.doInBackground(message.toString());
+    }
+
+    private void genericSend(String command){
+        asyncSendToPowerSupply a = new asyncSendToPowerSupply();
+        JSONObject message = new JSONObject();
+        try{
+            message.put("command", command);
+        } catch (JSONException e) {
+
+        }
+        a.doInBackground(message.toString());
+    }
+
+    private void setRemoteServer(String url, String password){
+        ArrayList<Pair<String, String>> listOfParameters = new ArrayList<>();
+        listOfParameters.add(Pair.create("url", url));
+        listOfParameters.add(Pair.create("password", password));
+        genericSend("set_remote_server", listOfParameters);
+    }
+
+    private void setPowerSupplySetting(String settingName, String settingValue){
+        ArrayList<Pair<String, String>> listOfParameters = new ArrayList<>();
+        listOfParameters.add(Pair.create("settingName", settingName));
+        listOfParameters.add(Pair.create("settingValue", settingValue));
+        genericSend("set_power_supply_setting", listOfParameters);
+    }
+
+    private void getAllSettings(){
+        genericSend("get_all_settings");
+    }
+
+    private void getFirmwareVersion(){
+        genericSend("get_firmware_version");
+    }
+
+    private void get_all_settings(){
+        genericSend("get_wlan_settings");
+    }
+
+    private void onMessageSent(String s){
+        //throw;
+    }
+
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {

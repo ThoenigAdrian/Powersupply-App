@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="advancedtech.nglabornetzgeraet.PowerSupplyConnecting">
+    tools:context="advancedtech.nglabornetzgeraet.PowerSupply">
 
     <Button
         android:id="@+id/decrease_voltage_channel_1"
