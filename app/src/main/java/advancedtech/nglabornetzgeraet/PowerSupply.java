@@ -1,10 +1,7 @@
 package advancedtech.nglabornetzgeraet;
 
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -15,83 +12,48 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class PowerSupplyConnecting extends AppCompatActivity {
 
 
     ArrayList<Button> voltageCurrentButtons = new ArrayList<>();
-    HighLevelCommunicationInterface hlc;
+    HighLevelCommunicationInterface hlc = HighLevelCommunicationInterface.getInstance();
+    Beacon passedPowerSuppyLnfo;
     String response;
 
     private class asyncSendToPowerSupply extends AsyncTask<String, Void, String>
     {
         @Override
         protected String doInBackground(String... params) {
-            hlc.send
+            return hlc.sendMessageToPowerSupply(params[0]);
         }
 
         @Override
         protected void onPostExecute(String s) {
-            onMessageSent();
+            onMessageSent(s);
         }
     }
 
     private class connectToPowerSupply extends AsyncTask<Void,Void,Void> {
 
-        private boolean error_occured=false;
         private String error_string="";
 
         @Override
-        protected  Void doInBackground(Void[] params) {
-            try {
-                powerSupplyConnection = new Socket(ip, port);
-            } catch (IOException e) {
-                error_occured=true;
-                error_string = e.toString();
-                return null;
-
-            } catch (Exception e) {
-                error_occured=true;
-                error_string = e.toString();
-                return null;
-            }
-
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(powerSupplyConnection.getInputStream()));
-                for (int i = 0; i < 10; i++) {
-                    response = reader.readLine();
-                    if (response == null) {
-                        error_occured = true;
-                        error_string = "couldn't read from tcp stream";
-                    }
-
-                }
-            } catch (Exception e) {
-                error_occured=true;
-                error_string = e.toString();
-                return null;
-            }
+        protected Void doInBackground(Void[] params) {
+            error_string = hlc.connectToPowerSupply(passedPowerSuppyLnfo);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void a) {
-            if(error_occured)
-                Toast.makeText(getApplicationContext(), error_string, Toast.LENGTH_LONG).show();
-            else
+            if(hlc.isPowerSupplyConnected())
                 onConnectionSuccessfull();
+            else
+                onConnectionFailed(error_string);
         }
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,14 +76,19 @@ public class PowerSupplyConnecting extends AppCompatActivity {
         voltageCurrentButtons.add(decrease_voltage_channel_1);
         voltageCurrentButtons.add(decrease_voltage_channel_2);
 
+        passedPowerSuppyLnfo = new Beacon((getIntent().getExtras().getString("beaconInfo")));
         connectToPowerSupply asyncConnectTask = new connectToPowerSupply();
         asyncConnectTask.execute();
-
 
     }
 
     public void onMessageSent(String response){
 
+    }
+
+    public void onConnectionFailed(String reason){
+        Toast.makeText(getApplicationContext(), reason, Toast.LENGTH_LONG).show();
+        finish();
     }
 
     public void onConnectionSuccessfull(){
@@ -165,6 +132,8 @@ public class PowerSupplyConnecting extends AppCompatActivity {
             liveDataChannel2.setText("Leistung: " + power + "W\n" + "Spannung: " + voltage + "V\n" +
                     "Strom: " + current + "A\n");
         } catch (JSONException e) {
+            Toast.makeText(this, "Error during setAllData" + e.toString(), Toast.LENGTH_LONG).show();
+        } catch (NullPointerException e){
             Toast.makeText(this, "Error during setAllData" + e.toString(), Toast.LENGTH_LONG).show();
         }
     }
