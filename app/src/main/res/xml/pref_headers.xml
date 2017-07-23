@@ -4,17 +4,14 @@
 
     <header
         android:fragment="advancedtech.nglabornetzgeraet.Settings$GeneralPreferenceFragment"
-        android:icon="@drawable/ic_info_black_24dp"
-        android:title="@string/pref_header_general" />
+        android:title="@string/general_power_supply_settings" />
 
     <header
         android:fragment="advancedtech.nglabornetzgeraet.Settings$NotificationPreferenceFragment"
-        android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/pref_header_notifications" />
+        android:title="@string/power_supply_wifi_settings" />
 
     <header
         android:fragment="advancedtech.nglabornetzgeraet.Settings$DataSyncPreferenceFragment"
-        android:icon="@drawable/ic_sync_black_24dp"
-        android:title="@string/pref_header_data_sync" />
+        android:title="@string/server_settings" />
 
 </preference-headers>
