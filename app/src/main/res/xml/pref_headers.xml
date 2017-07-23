@@ -7,7 +7,7 @@
         android:title="@string/general_power_supply_settings" />
 
     <header
-        android:fragment="advancedtech.nglabornetzgeraet.Settings$NotificationPreferenceFragment"
+        android:fragment="advancedtech.nglabornetzgeraet.Settings$PowerSupplyWIFIPreference"
         android:title="@string/power_supply_wifi_settings" />
 
     <header
@@ -15,15 +15,15 @@
         android:title="@string/server_settings" />
 
     <header
-        android:fragment="advancedtech.nglabornetzgeraet.Settings$DataSyncPreferenceFragment"
+        android:fragment="advancedtech.nglabornetzgeraet.Settings$AppPreferenceFragment"
         android:title="@string/app_settings" />
 
     <header
-        android:fragment="advancedtech.nglabornetzgeraet.Settings$DataSyncPreferenceFragment"
+        android:fragment="advancedtech.nglabornetzgeraet.Settings$FimrwareInformation"
         android:title="@string/firmware_information" />
 
     <header
-        android:fragment="advancedtech.nglabornetzgeraet.Settings$DataSyncPreferenceFragment"
+        android:fragment="advancedtech.nglabornetzgeraet.Settings$AppVersion"
         android:title="@string/app_versioninformation" />
 
 

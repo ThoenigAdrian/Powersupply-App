@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="remember_passwords"
+        android:title="@string/remember_passwords" />
+
+    <Preference
+        android:title="@string/reset"
+        android:key="my_key"/>
+
+</PreferenceScreen>

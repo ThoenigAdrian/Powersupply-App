@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="@string/current_version"
+        android:inputType="textCapWords"
+        android:key="example_text"
+        android:maxLines="1"
+        android:editable="false"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/version" />
+
+    <EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="@string/publish_date"
+        android:inputType="textCapWords"
+        android:key="example_text"
+        android:maxLines="1"
+        android:editable="false"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/date" />
+
+</PreferenceScreen>
