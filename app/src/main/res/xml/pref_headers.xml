@@ -14,4 +14,10 @@
         android:fragment="advancedtech.nglabornetzgeraet.Settings$DataSyncPreferenceFragment"
         android:title="@string/server_settings" />
 
+    <header
+        android:fragment="advancedtech.nglabornetzgeraet.Settings$DataSyncPreferenceFragment"
+        android:title="@string/server_settings" />
+
+
+
 </preference-headers>

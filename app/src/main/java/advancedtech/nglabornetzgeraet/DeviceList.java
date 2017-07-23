@@ -98,6 +98,7 @@ public class DeviceList extends AppCompatActivity{
 
 
     public void settingsButtonOnClick(View view) {
+        deviceListUpdateHandler.removeMessages(0);
         Intent intent = new Intent(this, Settings.class);
         startActivity(intent);
     }
