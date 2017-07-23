@@ -11,12 +11,20 @@
         android:title="@string/power_supply_wifi_settings" />
 
     <header
-        android:fragment="advancedtech.nglabornetzgeraet.Settings$DataSyncPreferenceFragment"
+        android:fragment="advancedtech.nglabornetzgeraet.Settings$ServerPreferenceFragment"
         android:title="@string/server_settings" />
 
     <header
         android:fragment="advancedtech.nglabornetzgeraet.Settings$DataSyncPreferenceFragment"
-        android:title="@string/server_settings" />
+        android:title="@string/app_settings" />
+
+    <header
+        android:fragment="advancedtech.nglabornetzgeraet.Settings$DataSyncPreferenceFragment"
+        android:title="@string/firmware_information" />
+
+    <header
+        android:fragment="advancedtech.nglabornetzgeraet.Settings$DataSyncPreferenceFragment"
+        android:title="@string/app_versioninformation" />
 
 
 
