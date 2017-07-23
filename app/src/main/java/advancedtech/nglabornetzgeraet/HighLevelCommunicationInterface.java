@@ -35,7 +35,8 @@ public class HighLevelCommunicationInterface {
     }
 
     public void setContext(Context context){
-        communicationInterface = new LowLevelCommunication((context));
+        if(communicationInterface==null)
+            communicationInterface = new LowLevelCommunication((context));
     }
 
     public boolean isPowerSupplyConnected(){
