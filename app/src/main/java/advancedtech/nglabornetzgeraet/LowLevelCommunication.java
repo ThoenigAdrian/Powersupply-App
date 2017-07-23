@@ -97,14 +97,15 @@ public class LowLevelCommunication {
 
     public String connectToPowerSupply(Beacon powerSupplyBeacon){
         String result = "Invalid connection type";
-        if(powerSupplyBeacon.connectionType.equals("WIFI")){
+        connectionType = powerSupplyBeacon.connectionType;
+        if(connectionType.equals("WIFI")){
             powerSupplyPort = powerSupplyBeacon.port;
             powerSupplyIPAddress = powerSupplyBeacon.ip;
             result = connectToPowerSupplyViaWIFI();
-        } else if (powerSupplyBeacon.connectionType.equals("Bluetooth")){
+        } else if (connectionType.equals("Bluetooth")){
             powerSupplybluetoothAddress = powerSupplyBeacon.bluetoothAddress;
             result = connectToPowerSupplyViaBluetooth();
-        } else if(powerSupplyBeacon.connectionType.equals("Server")){
+        } else if(connectionType.equals("Server")){
             powerSupplyPort = powerSupplyBeacon.port;
             powerSupplyIPAddress = powerSupplyBeacon.ip;
             result = connectToPowerSupplyViaServer();
@@ -294,6 +295,7 @@ public class LowLevelCommunication {
 
     public String sendMessageToPowerSupply(String message){
         String response = "Invalid connection type";
+        message += "\n";
         if(connectionType.equals("WIFI"))
             return sendMessageToPowerSupplyViaWIFI(message);
         else if (connectionType.equals("Bluetooth"))
@@ -307,7 +309,7 @@ public class LowLevelCommunication {
         String response;
         String result = "Couldn't send message";
         try {
-            powerSupplyOutputStream.writeChars(message);
+            powerSupplyOutputStream.write(message.getBytes());
             BufferedReader reader = new BufferedReader(new InputStreamReader(powerSupplyConnection.getInputStream()));
             response = reader.readLine();
             if (response == null) {
