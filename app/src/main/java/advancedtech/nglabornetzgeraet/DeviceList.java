@@ -1,11 +1,14 @@
 package advancedtech.nglabornetzgeraet;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatDrawableManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +18,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,16 +35,15 @@ public class DeviceList extends AppCompatActivity{
     public BeaconEvaluator beaconEvaluator = new BeaconEvaluator();
     private android.os.Handler deviceListUpdateHandler = new android.os.Handler();
     private ArrayList<Beacon> availablePowerSupplies = new ArrayList<>();
+    private ListView deviceList;
 
     private Runnable deviceListUpdater = new Runnable() {
         @Override
         public void run() {
             try {
-                updateDeviceList(); //this function can change value of refreshDeviceListPeriod.
+                updateDeviceList();
             } finally {
-                // 100% guarantee that this always happens, even if
-                // your update method throws an exception
-                int refreshDeviceListPeriod = 5000;
+                int refreshDeviceListPeriod = 1000;
                 deviceListUpdateHandler.postDelayed(deviceListUpdater, refreshDeviceListPeriod);
             }
         }
@@ -54,10 +57,10 @@ public class DeviceList extends AppCompatActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ListView lv = (ListView) findViewById(R.id.listview);
-        lv.setAdapter(new powerSupplyListAdapter(this, R.layout.power_supply_list_item, data));
+        deviceList = (ListView) findViewById(R.id.listview);
+        deviceList.setAdapter(new powerSupplyListAdapter(this, R.layout.power_supply_list_item, data));
 
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 deviceListUpdateHandler.removeMessages(0);
@@ -101,6 +104,7 @@ public class DeviceList extends AppCompatActivity{
         deviceListUpdateHandler.removeMessages(0);
         Intent intent = new Intent(this, Settings.class);
         startActivity(intent);
+        deviceListUpdateHandler.post(deviceListUpdater);
     }
 
 
@@ -126,18 +130,23 @@ public class DeviceList extends AppCompatActivity{
     }
 
     public void updateDeviceList(){
-        Log.v("bla", "startUpdate");
-        data = new ArrayList<>();
+        Log.v("performanceDebugging", "startUpdate");
         availablePowerSupplies = new ArrayList<>();
+        Beacon bluetoothFake = new Beacon("{\"name\":\"Adrians Netzgeraet\", \"version\":\"1\", \"bluetooth_address\":\"DFDFJK-DFJKDJFL\", \"port\":\"2223\", \"id\": 175640}", "Bluetooth");
+        Beacon serverFake = new Beacon("{\"name\":\"Adrians Netzgeraet\", \"version\":\"1\", \"server_ip\":\"192.168.175.1\", \"port\":\"2223\", \"id\": 175640}", "Server");
+        availablePowerSupplies.add(bluetoothFake);
+        availablePowerSupplies.add(serverFake);
+        data.clear();
+
         for (Beacon powerSupply: beaconEvaluator.getAvailablePowerSupplies().values()){
             availablePowerSupplies.add(powerSupply);
         }
         for(Beacon beacon : availablePowerSupplies){
                 data.add("Netzgerät (ID: " + beacon.ID + ")");
         }
-        ListView lv = (ListView) findViewById(R.id.listview);
-        lv.setAdapter(new powerSupplyListAdapter(this, R.layout.power_supply_list_item, data));
-        Log.v("performanceDebugging", "");
+
+        deviceList.setAdapter(new powerSupplyListAdapter(this, R.layout.power_supply_list_item, data));
+
         Log.v("performanceDebugging", "stopUpdate");
     }
 
@@ -158,14 +167,37 @@ public class DeviceList extends AppCompatActivity{
                 convertView = inflater.inflate(layout, parent, false);
                 ViewHolder viewHolder = new ViewHolder();
                 viewHolder.powerSupplyInfo = (TextView) convertView.findViewById(R.id.powerSupplyInfo);
-                viewHolder.connectionTypeSymbol = (ImageView) convertView.findViewById(R.id.connectionTypeSymbol);
 
+                if(availablePowerSupplies.get(position).connectionType.equals("WIFI")){
+                    ImageView wifiSymbol = (ImageView) convertView.findViewById(R.id.connectionTypeSymbol);
+                    Drawable wifiDrawable = AppCompatDrawableManager.get().getDrawable(getApplicationContext(), R.drawable.ic_wifi_connection_signal_symbol);
+                    wifiSymbol.setImageDrawable(wifiDrawable);
+                    viewHolder.connectionTypeSymbol = wifiSymbol;
+                }
+                else if(availablePowerSupplies.get(position).connectionType.equals("Bluetooth")){
+                    ImageView bluetoothSymbol = (ImageView) convertView.findViewById(R.id.connectionTypeSymbol);
+                    Drawable bluetoothDrawable = AppCompatDrawableManager.get().getDrawable(getApplicationContext(), R.drawable.ic_bluetooth);
+                    bluetoothSymbol.setImageDrawable(bluetoothDrawable);
+                    viewHolder.connectionTypeSymbol = bluetoothSymbol;
+                }
+                else if(availablePowerSupplies.get(position).connectionType.equals("Server")){
+                    ImageView bluetoothSymbol = (ImageView) convertView.findViewById(R.id.connectionTypeSymbol);
+                    Drawable serverDrawable = AppCompatDrawableManager.get().getDrawable(getApplicationContext(), R.drawable.ic_server_connection_type);
+                    bluetoothSymbol.setImageDrawable(serverDrawable);
+                    viewHolder.connectionTypeSymbol = bluetoothSymbol;
+                }
+                else{
+                    viewHolder.connectionTypeSymbol = (ImageView) convertView.findViewById(R.id.connectionTypeSymbol);
+                }
+
+                viewHolder.powerSupplyInfo.setText(getItem(position));
                 convertView.setTag(viewHolder);
             }
 
             else{
                 mainViewHolder = (ViewHolder) convertView.getTag();
-                mainViewHolder.powerSupplyInfo.setText(getItem(position));
+                String info = getItem(position);
+                mainViewHolder.powerSupplyInfo.setText(info);
             }
 
             return convertView;

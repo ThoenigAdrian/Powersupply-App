@@ -46,10 +46,10 @@ public class Beacon {
             }
 
             else if(connectionType.equals("Bluetooth"))
-                bluetoothAddress = receivedBeacon.getString("bluetoothAddress");
+                bluetoothAddress = receivedBeacon.getString("bluetooth_address");
 
             else if(connectionType.equals("Server"))
-                serverIP = receivedBeacon.getString("serverIP");
+                serverIP = receivedBeacon.getString("server_ip");
 
         } catch(JSONException e){
             throw new IllegalArgumentException("unexpected parsing error", e); // java won't allow to rethrow JSONException ... seriously !?!
