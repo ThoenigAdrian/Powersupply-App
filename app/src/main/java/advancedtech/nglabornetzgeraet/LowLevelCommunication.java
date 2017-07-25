@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -39,17 +40,16 @@ public class LowLevelCommunication {
     private BluetoothAdapter bluetoothAdapter;
     private ArrayList<BluetoothDevice> foundBluetoothDevices = new ArrayList<>();;
     private int powerSupplyPort;
-    private Handler beaconHandler;
     private int connectTimeoutMs = 10*1000;
     private int sendTimeoutSec = 5;
     private boolean error_occured = false;
     private String error_string = "";
+    Thread beaconCollectorThread;
     private Context ApplicationContext;
     private boolean wifiAdapterAvailable = false;
     private boolean wifiEnabled = false;
     private boolean bluetoothAdapterAvailable = false;
     private boolean bluetoothEnabled = false;
-    private boolean beaconCollecotrRunning = false;
     DataOutputStream powerSupplyOutputStream;
     BufferedReader powerSupplyInputStream;
     private String connectionType;
@@ -87,7 +87,6 @@ public class LowLevelCommunication {
 
     public LowLevelCommunication(Context ctx){
         ApplicationContext = ctx;
-        beaconHandler = new Handler();
         updateConnectionPossibilities();
         initializeBluetooth();
         initializeWIFI();
@@ -212,12 +211,8 @@ public class LowLevelCommunication {
         @Override
         public void run() {
             try {
-                collectBeacons(); //this function can change value of refreshDeviceListPeriod.
+                 collectBeacons();
             } finally {
-                // 100% guarantee that this always happens, even if
-                // your update method throws an exception
-                int refreshDeviceListPeriod = 500;
-                beaconHandler.postDelayed(beaconCollector, refreshDeviceListPeriod);
             }
         }
     };
@@ -243,11 +238,13 @@ public class LowLevelCommunication {
     }
 
     void startCollectingBeacons() {
-        beaconCollector.run();
+        beaconCollectorThread = new Thread(beaconCollector);
+        beaconCollectorThread.start();
     }
 
     void stopCollectingBeacons() {
-        beaconHandler.removeCallbacks(beaconCollector);
+        beaconCollectorThread.interrupt();
+
     }
 
 
@@ -255,13 +252,7 @@ public class LowLevelCommunication {
     {
         byte[] receivedata = new byte[1024];
         DatagramPacket recv_packet = new DatagramPacket(receivedata, receivedata.length);
-        try{
-            udpBeaconListener.setSoTimeout(100);
-        }
-        catch (SocketException e)
-        {
-            //Toast.makeText(this, "Can't set udp timeout for whatever reason : " + e.toString(), Toast.LENGTH_LONG).show();
-        }
+
         while(true) {
             try {
                 udpBeaconListener.receive(recv_packet);
@@ -270,22 +261,19 @@ public class LowLevelCommunication {
                     Beacon b = new Beacon(recv_string, "WIFI");
                     beacons.put(b.ID, b);
                 } catch (IllegalArgumentException e) {
-                    break;
+                    Log.v("debug", "Error while parsing beacon: " + e.toString());
                 }
 
             } catch (SocketTimeoutException e) {
                 break;
             } catch (IOException e) {
-                //Toast.makeText(this, "Can't receive from UDP Socket becuase" + e.toString(), Toast.LENGTH_LONG).show();
-                break;
+                Log.v("Debug", "Can't receive from UDP Socket because" + e.toString());
             }
         }
     }
 
 
     public BeaconList getBeacons() {
-        if(!beaconCollecotrRunning)
-            startCollectingBeacons();
         return beacons;
     }
 
